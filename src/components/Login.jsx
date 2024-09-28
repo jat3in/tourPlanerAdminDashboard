@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Login = ({ onLoginSuccess }) => {
-  const [formData, setFormData] = useState({ name: "", password: "" });
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
@@ -11,46 +12,26 @@ const Login = ({ onLoginSuccess }) => {
     setFormData((prevState) => ({ ...prevState, [name]: value }));
   };
 
-  const validateForm = () => {
-    let newErrors = {};
-    if (!formData.name.trim()) {
-      newErrors.name = "Name is required";
-    } else if (!/^[a-zA-Z0-9]{3,20}$/.test(formData.name)) {
-      newErrors.name = "Name must be 3-20 characters and alphanumeric";
-    }
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    } else if (
-      !/^(?=.*[A-Za-z])(?=.*\d)[\w@$!%*?&]{8,}$/.test(formData.password)
-    ) {
-      newErrors.password =
-        "Password must be at least 8 characters, including letters and numbers";
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validateForm()) {
-      try {
-        console.log("Form submitted:", formData);
-        // const response = await fetch("/api/login", {
-        //   method: "POST",
-        //   headers: { "Content-Type": "application/json" },
-        //   body: JSON.stringify(formData),
-        // });
-        if (true) {
-          // Login successful
-          onLoginSuccess();
-          navigate("/dashboard");
-        } else {
-          setErrors({ form: "Invalid credentials" });
-        }
-      } catch (error) {
-        setErrors({ form: "An error occurred. Please try again." });
-      }
-    }
+      const {email, password } = formData;
+      console.log(formData);
+      if (!email && !password) alert("Please fill all fields");
+      axios
+        .post(
+          `https://tourplaner-1.onrender.com/login`,
+          formData
+        )
+        .then((res) => {
+          if (res.data.message === "Login Successfull") {
+            alert("Logged In Successfully");
+            onLoginSuccess()
+            navigate("/dashboard")
+  
+          } else {
+            alert(res.data.message);
+          }
+        })
   };
 
   return (
@@ -64,11 +45,11 @@ const Login = ({ onLoginSuccess }) => {
         <div className="">
           <form onSubmit={handleSubmit} className="flex flex-col gap-1">
             <div className="flex flex-col w-full">
-              <label className="text-white">Name</label>
+              <label className="text-white">Email</label>
               <input
                 type="text"
-                name="name"
-                value={formData.name}
+                name="email"
+                value={formData.email}
                 onChange={handleChange}
                 className="mt-0.5 rounded-md bg-transparent border-[1px] text-white px-2"
               />
