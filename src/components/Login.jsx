@@ -19,7 +19,7 @@ const Login = ({ onLoginSuccess }) => {
       if (!email && !password) alert("Please fill all fields");
       axios
         .post(
-          `https://tourplaner-1.onrender.com/login`,
+          `https://tourplaner-4.onrender.com/login`,
           formData
         )
         .then((res) => {
